@@ -284,25 +284,52 @@ function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
 // ─── Match My Clothes result components ───────────────────────────────────────
 
 function MatchOutfitCard({ outfit }: { outfit: MatchOutfit }) {
-  const [imgError, setImgError] = useState(false);
-  const photoUrl = "https://loremflickr.com/400/500/mens,fashion,outfit";
+  const [photoUrl, setPhotoUrl]         = useState<string | null>(null);
+  const [photographer, setPhotographer] = useState("");
+  const [imgError, setImgError]         = useState(false);
+
+  useEffect(() => {
+    const query = buildPexelsQuery(outfit.occasion, "");
+    fetch(`${API_URL}/api/pexels-photo`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query }),
+    })
+      .then(r => r.json() as Promise<{ photoUrl: string | null; photographer?: string }>)
+      .then(data => {
+        if (data.photoUrl) {
+          setPhotoUrl(data.photoUrl);
+          setPhotographer(data.photographer ?? "");
+        }
+      })
+      .catch(() => {});
+  }, [outfit.name, outfit.occasion]);
+
+  const showPhoto = photoUrl !== null && !imgError;
 
   return (
     <div className="outfit-card">
-      {imgError ? (
-        <div className="match-outfit-colors">
-          {outfit.colours.map((c, i) => (
-            <div key={i} className="match-outfit-color-block" style={{ background: c, flex: i === 0 ? 2 : 1 }} />
-          ))}
-        </div>
-      ) : (
-        <img
-          src={photoUrl}
-          alt={outfit.name}
-          className="outfit-photo"
-          onError={() => setImgError(true)}
-        />
-      )}
+      <div className={`outfit-figure-area${showPhoto ? " outfit-figure-area--photo" : ""}`}>
+        {showPhoto ? (
+          <>
+            <img
+              src={photoUrl}
+              alt={outfit.name}
+              className="outfit-photo"
+              onError={() => setImgError(true)}
+            />
+            {photographer && (
+              <span className="photo-credit">Photo: {photographer} / Pexels</span>
+            )}
+          </>
+        ) : (
+          <div className="match-outfit-colors">
+            {outfit.colours.map((c, i) => (
+              <div key={i} className="match-outfit-color-block" style={{ background: c, flex: i === 0 ? 2 : 1 }} />
+            ))}
+          </div>
+        )}
+      </div>
       <div className="outfit-body">
         <div className="outfit-top">
           <span className="outfit-name">{outfit.name}</span>
