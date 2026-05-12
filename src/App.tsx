@@ -164,10 +164,19 @@ function StepHeader({
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function buildPhotoSearch(name: string, occasion: string): string {
-  const clean = (s: string) =>
-    s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, "+");
-  return `mens+fashion+${clean(occasion)}+${clean(name)}+outfit`;
+function buildPhotoKeyword(occasion: string): string {
+  const keyMap: Record<string, string> = {
+    office:  "formal",
+    casual:  "casual",
+    date:    "smart",
+    wedding: "wedding",
+    ethnic:  "ethnic",
+    gym:     "athletic",
+    beach:   "beach",
+    streetwear: "streetwear",
+  };
+  const first = occasion.toLowerCase().replace(/[^a-z\s]/g, "").trim().split(/\s+/)[0];
+  return keyMap[first] ?? first;
 }
 
 // ─── Style Profile result components ─────────────────────────────────────────
@@ -218,7 +227,7 @@ function OutfitFigure({ colors }: { colors: { hex: string }[] }) {
 
 function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
   const [imgError, setImgError] = useState(false);
-  const photoUrl = `https://source.unsplash.com/400x500/?${buildPhotoSearch(outfit.name, outfit.occasion)}`;
+  const photoUrl = `https://loremflickr.com/400/500/mens,fashion,${buildPhotoKeyword(outfit.occasion)}`;
 
   return (
     <div className="outfit-card">
@@ -254,7 +263,7 @@ function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
 
 function MatchOutfitCard({ outfit }: { outfit: MatchOutfit }) {
   const [imgError, setImgError] = useState(false);
-  const photoUrl = `https://source.unsplash.com/400x500/?${buildPhotoSearch(outfit.name, outfit.occasion)}`;
+  const photoUrl = `https://loremflickr.com/400/500/mens,fashion,${buildPhotoKeyword(outfit.occasion)}`;
 
   return (
     <div className="outfit-card">
