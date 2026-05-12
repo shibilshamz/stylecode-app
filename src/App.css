@@ -578,6 +578,18 @@
   padding: 0;
   background: #E8E0D4;
   overflow: hidden;
+  position: relative;
+}
+
+.photo-credit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 9px;
+  color: rgba(255,255,255,0.85);
+  background: rgba(0,0,0,0.32);
+  padding: 2px 7px;
+  letter-spacing: 0.2px;
 }
 
 .outfit-photo {

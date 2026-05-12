@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getStyleAdvice } from "./geminiAdvisor";
 import type { StyleResult, StyleProfile } from "./geminiAdvisor";
 import "./App.css";
@@ -208,22 +208,61 @@ function OutfitFigure({ colors }: { colors: { hex: string }[] }) {
   );
 }
 
+function buildPexelsQuery(occasion: string, firstColour: string): string {
+  const occasionMap: Record<string, string> = {
+    office:  "formal",
+    casual:  "casual streetwear",
+    date:    "evening smart",
+    wedding: "ethnic traditional",
+    gym:     "activewear",
+    beach:   "summer resort",
+  };
+  const key = occasion.toLowerCase().replace(/[^a-z\s]/g, "").trim().split(/\s+/)[0];
+  const keyword = occasionMap[key] ?? key;
+  return `men ${keyword} ${firstColour} outfit`.trim();
+}
+
 function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
-  const [imgError, setImgError] = useState(false);
-  const photoUrl = "https://loremflickr.com/400/500/mens,fashion,outfit";
+  const [photoUrl, setPhotoUrl]           = useState<string | null>(null);
+  const [photographer, setPhotographer]   = useState("");
+  const [imgError, setImgError]           = useState(false);
+
+  useEffect(() => {
+    const query = buildPexelsQuery(outfit.occasion, outfit.colors[0]?.name ?? "");
+    fetch(`${API_URL}/api/pexels-photo`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ query }),
+    })
+      .then(r => r.json() as Promise<{ photoUrl: string | null; photographer?: string }>)
+      .then(data => {
+        if (data.photoUrl) {
+          setPhotoUrl(data.photoUrl);
+          setPhotographer(data.photographer ?? "");
+        }
+      })
+      .catch(() => {});
+  }, [outfit.name, outfit.occasion]);
+
+  const showPhoto = photoUrl !== null && !imgError;
 
   return (
     <div className="outfit-card">
-      <div className={`outfit-figure-area${imgError ? "" : " outfit-figure-area--photo"}`}>
-        {imgError ? (
-          <OutfitFigure colors={outfit.colors} />
+      <div className={`outfit-figure-area${showPhoto ? " outfit-figure-area--photo" : ""}`}>
+        {showPhoto ? (
+          <>
+            <img
+              src={photoUrl}
+              alt={outfit.name}
+              className="outfit-photo"
+              onError={() => setImgError(true)}
+            />
+            {photographer && (
+              <span className="photo-credit">Photo: {photographer} / Pexels</span>
+            )}
+          </>
         ) : (
-          <img
-            src={photoUrl}
-            alt={outfit.name}
-            className="outfit-photo"
-            onError={() => setImgError(true)}
-          />
+          <OutfitFigure colors={outfit.colors} />
         )}
       </div>
       <div className="outfit-body">

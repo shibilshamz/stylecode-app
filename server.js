@@ -138,6 +138,35 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+app.post("/api/pexels-photo", async (req, res) => {
+  const { query } = req.body ?? {};
+  if (!query) return res.json({ photoUrl: null });
+
+  const PEXELS_API_KEY = process.env.PEXELS_API_KEY;
+  if (!PEXELS_API_KEY) return res.json({ photoUrl: null });
+
+  try {
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=portrait`;
+    const response = await fetch(url, {
+      headers: { Authorization: PEXELS_API_KEY },
+    });
+
+    if (!response.ok) return res.json({ photoUrl: null });
+
+    const data = await response.json();
+    const photo = data.photos?.[0];
+    if (!photo) return res.json({ photoUrl: null });
+
+    return res.json({
+      photoUrl: photo.src.portrait,
+      photographer: photo.photographer,
+      pexelsLink: photo.url,
+    });
+  } catch {
+    return res.json({ photoUrl: null });
+  }
+});
+
 app.post("/api/style", async (req, res) => {
   const { skinTone, bodyShape, height, occasion } = req.body ?? {};
   if (!skinTone || !bodyShape || !height || !occasion) {
