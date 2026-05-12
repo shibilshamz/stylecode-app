@@ -64,6 +64,7 @@ Return exactly 10-12 colours in the palette covering:
 - 2-3 accent colours (one bold, one soft, one versatile neutral)
 - 1-2 base colours (white variants, ivory, cream)
 Spread across light, medium and dark values so the user has options for every situation.
+IMPORTANT: You MUST return exactly 10 to 12 colour objects in the palette array. Returning fewer than 10 is incorrect.
 
 CRITICAL INSTRUCTION: You must respond ONLY with a single valid JSON object. No markdown fences, no explanation text, no comments. The JSON must exactly match this schema:
 
