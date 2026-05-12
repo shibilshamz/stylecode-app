@@ -162,6 +162,14 @@ function StepHeader({
   );
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function buildPhotoSearch(name: string, occasion: string): string {
+  const clean = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9\s]/g, "").trim().replace(/\s+/g, "+");
+  return `mens+fashion+${clean(occasion)}+${clean(name)}+outfit`;
+}
+
 // ─── Style Profile result components ─────────────────────────────────────────
 
 function Palette({ swatches }: { swatches: { name: string; hex: string; pantone: string; realWorldRef: string }[] }) {
@@ -209,10 +217,22 @@ function OutfitFigure({ colors }: { colors: { hex: string }[] }) {
 }
 
 function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
+  const [imgError, setImgError] = useState(false);
+  const photoUrl = `https://source.unsplash.com/400x500/?${buildPhotoSearch(outfit.name, outfit.occasion)}`;
+
   return (
     <div className="outfit-card">
-      <div className="outfit-figure-area">
-        <OutfitFigure colors={outfit.colors} />
+      <div className={`outfit-figure-area${imgError ? "" : " outfit-figure-area--photo"}`}>
+        {imgError ? (
+          <OutfitFigure colors={outfit.colors} />
+        ) : (
+          <img
+            src={photoUrl}
+            alt={outfit.name}
+            className="outfit-photo"
+            onError={() => setImgError(true)}
+          />
+        )}
       </div>
       <div className="outfit-body">
         <div className="outfit-top">
@@ -220,6 +240,11 @@ function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
           <span className="outfit-badge">{outfit.occasion}</span>
         </div>
         <p className="outfit-why">{outfit.why}</p>
+        <div className="outfit-color-chips">
+          {outfit.colors.map((c, i) => (
+            <div key={i} className="outfit-color-chip" style={{ background: c.hex }} title={c.name} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -228,23 +253,36 @@ function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
 // ─── Match My Clothes result components ───────────────────────────────────────
 
 function MatchOutfitCard({ outfit }: { outfit: MatchOutfit }) {
+  const [imgError, setImgError] = useState(false);
+  const photoUrl = `https://source.unsplash.com/400x500/?${buildPhotoSearch(outfit.name, outfit.occasion)}`;
+
   return (
     <div className="outfit-card">
-      <div className="match-outfit-colors">
-        {outfit.colours.map((c, i) => (
-          <div
-            key={i}
-            className="match-outfit-color-block"
-            style={{ background: c, flex: i === 0 ? 2 : 1 }}
-          />
-        ))}
-      </div>
+      {imgError ? (
+        <div className="match-outfit-colors">
+          {outfit.colours.map((c, i) => (
+            <div key={i} className="match-outfit-color-block" style={{ background: c, flex: i === 0 ? 2 : 1 }} />
+          ))}
+        </div>
+      ) : (
+        <img
+          src={photoUrl}
+          alt={outfit.name}
+          className="outfit-photo"
+          onError={() => setImgError(true)}
+        />
+      )}
       <div className="outfit-body">
         <div className="outfit-top">
           <span className="outfit-name">{outfit.name}</span>
           <span className="outfit-badge">{outfit.occasion}</span>
         </div>
         <p className="outfit-why">{outfit.why}</p>
+        <div className="outfit-color-chips">
+          {outfit.colours.map((c, i) => (
+            <div key={i} className="outfit-color-chip" style={{ background: c }} />
+          ))}
+        </div>
       </div>
     </div>
   );

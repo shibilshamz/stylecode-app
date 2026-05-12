@@ -58,6 +58,13 @@ Always include accurate Pantone TCX (textile) colour codes for every colour you 
 - Dusty Rose = 15-1614 TCX
 - Charcoal = 18-0306 TCX
 
+Return exactly 10-12 colours in the palette covering:
+- 3-4 warm tones (earthy, terracotta, rust, camel range)
+- 3-4 cool/neutral tones (navy, slate, olive, forest range)
+- 2-3 accent colours (one bold, one soft, one versatile neutral)
+- 1-2 base colours (white variants, ivory, cream)
+Spread across light, medium and dark values so the user has options for every situation.
+
 CRITICAL INSTRUCTION: You must respond ONLY with a single valid JSON object. No markdown fences, no explanation text, no comments. The JSON must exactly match this schema:
 
 {
@@ -65,6 +72,13 @@ CRITICAL INSTRUCTION: You must respond ONLY with a single valid JSON object. No 
   "profileDesc": "2 sentences describing his inherent style strengths and the energy his look should project",
   "palette": [
     { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "think warm brick, burnt clay pots" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
     { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
     { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
     { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
@@ -144,7 +158,7 @@ Give me exactly 5 palette colours that flatter his skin tone, 3 outfit combinati
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 1800,
+        max_tokens: 2200,
         system: SYSTEM_INSTRUCTION,
         messages: [{ role: "user", content: prompt }],
       }),
