@@ -146,7 +146,8 @@ app.post("/api/pexels-photo", async (req, res) => {
   if (!PEXELS_API_KEY) return res.json({ photoUrl: null });
 
   try {
-    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=portrait`;
+    const randomPage = Math.floor(Math.random() * 5) + 1;
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=3&page=${randomPage}&orientation=portrait`;
     const response = await fetch(url, {
       headers: { Authorization: PEXELS_API_KEY },
     });
@@ -154,8 +155,9 @@ app.post("/api/pexels-photo", async (req, res) => {
     if (!response.ok) return res.json({ photoUrl: null });
 
     const data = await response.json();
-    const photo = data.photos?.[0];
-    if (!photo) return res.json({ photoUrl: null });
+    const photos = data.photos ?? [];
+    if (!photos.length) return res.json({ photoUrl: null });
+    const photo = photos[Math.floor(Math.random() * photos.length)];
 
     return res.json({
       photoUrl: photo.src.portrait,
