@@ -1003,22 +1003,72 @@
   justify-content: space-between;
 }
 
-/* ── Responsive ───────────────────────────────────────────────────────────── */
+/* ── Responsive (mobile: 375–480px) ──────────────────────────────────────── */
 
-@media (max-width: 640px) {
-  .app-header { padding: 16px 20px; }
-  .screen { padding: 32px 20px 48px; gap: 28px; }
-  .step-title { font-size: 28px; }
+@media (max-width: 480px) {
+
+  /* Padding & spacing */
+  .app-header { padding: 14px 16px; }
+  .screen     { padding: 24px 16px 48px; gap: 24px; }
+
+  /* Step indicator — keep dots, hide text labels to save space */
+  .dot-label  { display: none; }
+
+  /* Typography */
+  .step-title        { font-size: 26px; }
+  .home-title        { font-size: 26px; }
+  .home-option-title { font-size: 22px; }
+  .profile-title     { font-size: 28px; }
+  .loading-title     { font-size: 26px; }
+
+  /* Skin tone — 2 columns */
   .skin-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Body shape — 3 columns */
   .shape-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Occasion — 2 columns */
   .occasion-grid { grid-template-columns: repeat(2, 1fr); }
-  .outfit-grid { grid-template-columns: 1fr; }
-  .tips-grid { grid-template-columns: 1fr; }
-  .palette-row { gap: 10px; }
-  .palette-swatch { height: 56px; }
-  .profile-title { font-size: 36px; }
-  .home-title { font-size: 36px; }
+
+  /* Home cards — stack vertically */
   .home-options { grid-template-columns: 1fr; }
+
+  /* Colour palette — 2-column grid, taller swatches */
+  .palette-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .palette-item   { min-width: unset; }
+  .palette-swatch { height: 64px; }
+
+  /* Outfit grid — single column */
+  .outfit-grid { grid-template-columns: 1fr; }
+
+  /* Outfit photo — full width, consistent height */
+  .outfit-photo { width: 100%; height: 200px; }
+
+  /* Tips — single column */
+  .tips-grid { grid-template-columns: 1fr; }
+
+  /* Buttons — full width, 48px min tap target */
+  .btn-primary,
+  .btn-ghost {
+    width: 100%;
+    min-height: 48px;
+    text-align: center;
+  }
+
+  /* Nav row — stack, primary CTA on bottom (thumb reach) */
+  .nav-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Match swatches — 2 columns */
   .match-swatches { grid-template-columns: repeat(2, 1fr); }
-  .result-footer--split { flex-direction: column; align-items: stretch; gap: 12px; }
+
+  /* Result footers */
+  .result-footer         { padding: 20px 0 4px; }
+  .result-footer--split  { flex-direction: column; align-items: stretch; gap: 12px; }
 }
