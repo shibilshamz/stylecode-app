@@ -8,12 +8,20 @@ export interface StyleProfile {
 export interface ColourSwatch {
   name: string;
   hex: string;
+  pantone: string;
+  realWorldRef: string;
+}
+
+export interface OutfitColour {
+  name: string;
+  hex: string;
+  pantone: string;
 }
 
 export interface Outfit {
   name: string;
   occasion: string;
-  colors: string[];
+  colors: OutfitColour[];
   why: string;
 }
 

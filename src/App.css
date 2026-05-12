@@ -535,6 +535,22 @@
   font-weight: 400;
 }
 
+.palette-pantone {
+  font-size: 10px;
+  color: #9A8F80;
+  text-align: center;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+.palette-realworld {
+  font-size: 10px;
+  color: #B0A490;
+  text-align: center;
+  font-style: italic;
+  line-height: 1.4;
+}
+
 /* Outfit cards */
 .outfit-grid {
   display: grid;
@@ -878,6 +894,20 @@
   font-size: 13px;
   font-weight: 500;
   color: #1A1612;
+}
+
+.match-swatch-pantone {
+  font-size: 10px;
+  color: #9A8F80;
+  letter-spacing: 0.3px;
+  font-weight: 500;
+}
+
+.match-swatch-realworld {
+  font-size: 10px;
+  color: #B0A490;
+  font-style: italic;
+  line-height: 1.4;
 }
 
 .match-swatch-reason {

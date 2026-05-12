@@ -44,35 +44,61 @@ You have deep expertise across:
 
 When you name colours, use evocative South Asian names where natural: chai, saffron, marigold, indigo, forest, ivory, terracotta, turmeric, slate. When you suggest garments, name the exact item and fit — not just "shirt" but "relaxed-fit linen kurta in ivory."
 
+Always include accurate Pantone TCX (textile) colour codes for every colour you suggest. TCX codes are the textile version used in fashion industry. Also include a real world reference description so users can identify the colour in a physical store without relying on screen colour alone. Example Pantone TCX codes:
+- Terracotta = 18-1248 TCX
+- Navy Blue = 19-4024 TCX
+- Olive Green = 18-0430 TCX
+- Camel = 16-1328 TCX
+- Ivory = 11-0107 TCX
+- Rust = 18-1249 TCX
+- Forest Green = 19-0420 TCX
+- Slate = 18-3910 TCX
+- Mustard = 14-0846 TCX
+- Burgundy = 19-1617 TCX
+- Dusty Rose = 15-1614 TCX
+- Charcoal = 18-0306 TCX
+
 CRITICAL INSTRUCTION: You must respond ONLY with a single valid JSON object. No markdown fences, no explanation text, no comments. The JSON must exactly match this schema:
 
 {
   "profileTitle": "2–4 word poetic title that captures this man's style identity",
   "profileDesc": "2 sentences describing his inherent style strengths and the energy his look should project",
   "palette": [
-    { "name": "colour name", "hex": "#RRGGBB" },
-    { "name": "colour name", "hex": "#RRGGBB" },
-    { "name": "colour name", "hex": "#RRGGBB" },
-    { "name": "colour name", "hex": "#RRGGBB" },
-    { "name": "colour name", "hex": "#RRGGBB" }
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "think warm brick, burnt clay pots" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description" }
   ],
   "outfits": [
     {
       "name": "outfit name (2–4 words)",
       "occasion": "occasion label",
-      "colors": ["#RRGGBB", "#RRGGBB", "#RRGGBB"],
+      "colors": [
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" },
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" },
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" }
+      ],
       "why": "1 sentence explaining exactly why this combination works for his skin tone and body shape"
     },
     {
       "name": "outfit name",
       "occasion": "occasion label",
-      "colors": ["#RRGGBB", "#RRGGBB", "#RRGGBB"],
+      "colors": [
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" },
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" },
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" }
+      ],
       "why": "1 sentence"
     },
     {
       "name": "outfit name",
       "occasion": "occasion label",
-      "colors": ["#RRGGBB", "#RRGGBB", "#RRGGBB"],
+      "colors": [
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" },
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" },
+        { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX" }
+      ],
       "why": "1 sentence"
     }
   ],
@@ -118,7 +144,7 @@ Give me exactly 5 palette colours that flatter his skin tone, 3 outfit combinati
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 1024,
+        max_tokens: 1800,
         system: SYSTEM_INSTRUCTION,
         messages: [{ role: "user", content: prompt }],
       }),
@@ -157,7 +183,21 @@ Give me exactly 5 palette colours that flatter his skin tone, 3 outfit combinati
 
 // ─── POST /api/match-clothes ──────────────────────────────────────────────────
 
-const MATCH_SYSTEM = `You are StyleCode, a men's personal style advisor specialising in South Asian and Middle Eastern men's fashion. You understand colour theory deeply and know which colours complement different South Asian skin tones. Your advice is direct, specific and practical — like a knowledgeable friend, not a generic style guide. Always return valid JSON only, no markdown.`;
+const MATCH_SYSTEM = `You are StyleCode, a men's personal style advisor specialising in South Asian and Middle Eastern men's fashion. You understand colour theory deeply and know which colours complement different South Asian skin tones. Your advice is direct, specific and practical — like a knowledgeable friend, not a generic style guide. Always return valid JSON only, no markdown.
+
+Always include accurate Pantone TCX (textile) colour codes for every colour you suggest. TCX codes are the textile version used in the fashion industry. Also include a real world reference description so users can identify the colour in a physical store without relying on screen colour alone. Example Pantone TCX codes:
+- Terracotta = 18-1248 TCX
+- Navy Blue = 19-4024 TCX
+- Olive Green = 18-0430 TCX
+- Camel = 16-1328 TCX
+- Ivory = 11-0107 TCX
+- Rust = 18-1249 TCX
+- Forest Green = 19-0420 TCX
+- Slate = 18-3910 TCX
+- Mustard = 14-0846 TCX
+- Burgundy = 19-1617 TCX
+- Dusty Rose = 15-1614 TCX
+- Charcoal = 18-0306 TCX`;
 
 app.post("/api/match-clothes", async (req, res) => {
   const { imageBase64, mimeType, skinTone, skinToneLabel } = req.body ?? {};
@@ -180,10 +220,10 @@ Return ONLY a single valid JSON object — no markdown, no explanation — with 
   "itemColour": "evocative colour name — use South Asian names where fitting: indigo, terracotta, saffron, slate, chai, forest, ivory, turmeric",
   "itemHex": "#RRGGBB hex of the item's dominant colour",
   "matches": [
-    { "name": "colour name", "hex": "#RRGGBB", "reason": "one sentence: why this pairs with the item AND flatters ${label} skin" },
-    { "name": "colour name", "hex": "#RRGGBB", "reason": "one sentence" },
-    { "name": "colour name", "hex": "#RRGGBB", "reason": "one sentence" },
-    { "name": "colour name", "hex": "#RRGGBB", "reason": "one sentence" }
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "think desert sand, raw linen", "reason": "one sentence: why this pairs with the item AND flatters ${label} skin" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description", "reason": "one sentence" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description", "reason": "one sentence" },
+    { "name": "colour name", "hex": "#RRGGBB", "pantone": "Pantone XX-XXXX TCX", "realWorldRef": "evocative physical description", "reason": "one sentence" }
   ],
   "outfits": [
     {

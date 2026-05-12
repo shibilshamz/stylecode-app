@@ -47,6 +47,8 @@ const MATCH_STEPS = ["Skin Tone", "Upload"];
 interface MatchColour {
   name: string;
   hex: string;
+  pantone: string;
+  realWorldRef: string;
   reason: string;
 }
 
@@ -162,23 +164,25 @@ function StepHeader({
 
 // ─── Style Profile result components ─────────────────────────────────────────
 
-function Palette({ swatches }: { swatches: { name: string; hex: string }[] }) {
+function Palette({ swatches }: { swatches: { name: string; hex: string; pantone: string; realWorldRef: string }[] }) {
   return (
     <div className="palette-row">
       {swatches.map((s) => (
         <div key={s.name} className="palette-item">
           <div className="palette-swatch" style={{ background: s.hex }} />
           <span className="palette-name">{s.name}</span>
+          <span className="palette-pantone">{s.pantone}</span>
+          <span className="palette-realworld">"{s.realWorldRef}"</span>
         </div>
       ))}
     </div>
   );
 }
 
-function OutfitFigure({ colors }: { colors: string[] }) {
-  const shirt    = colors[0] ?? "#BDB3A4";
-  const trousers = colors[1] ?? "#8A7E72";
-  const jacket   = colors[2];
+function OutfitFigure({ colors }: { colors: { hex: string }[] }) {
+  const shirt    = colors[0]?.hex ?? "#BDB3A4";
+  const trousers = colors[1]?.hex ?? "#8A7E72";
+  const jacket   = colors[2]?.hex;
 
   return (
     <svg viewBox="0 0 80 132" className="outfit-figure" aria-hidden="true">
@@ -715,6 +719,8 @@ export default function App() {
                 <div key={m.hex} className="match-swatch-card">
                   <div className="match-swatch-block" style={{ background: m.hex }} />
                   <span className="match-swatch-name">{m.name}</span>
+                  <span className="match-swatch-pantone">{m.pantone}</span>
+                  <span className="match-swatch-realworld">"{m.realWorldRef}"</span>
                   <p className="match-swatch-reason">{m.reason}</p>
                 </div>
               ))}
