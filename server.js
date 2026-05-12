@@ -58,13 +58,14 @@ Always include accurate Pantone TCX (textile) colour codes for every colour you 
 - Dusty Rose = 15-1614 TCX
 - Charcoal = 18-0306 TCX
 
-Return exactly 10-12 colours in the palette covering:
-- 3-4 warm tones (earthy, terracotta, rust, camel range)
-- 3-4 cool/neutral tones (navy, slate, olive, forest range)
-- 2-3 accent colours (one bold, one soft, one versatile neutral)
-- 1-2 base colours (white variants, ivory, cream)
-Spread across light, medium and dark values so the user has options for every situation.
-IMPORTANT: You MUST return exactly 10 to 12 colour objects in the palette array. Returning fewer than 10 is incorrect.
+CRITICAL: palette array MUST have exactly 10 to 12 colour objects. Returning fewer than 10 is an error. Spread them like this:
+- 3 warm tones (terracotta, rust, camel, copper range)
+- 3 cool/neutral tones (navy, slate, olive, forest green range)
+- 2 accent colours (one bold, one soft)
+- 2 base colours (ivory, cream, off-white range)
+- 1-2 wildcards that specifically flatter this skin tone
+
+Each colour needs: name, hex, pantone, realWorldRef
 
 CRITICAL INSTRUCTION: You must respond ONLY with a single valid JSON object. No markdown fences, no explanation text, no comments. The JSON must exactly match this schema:
 
@@ -159,7 +160,7 @@ Give me exactly 5 palette colours that flatter his skin tone, 3 outfit combinati
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 2200,
+        max_tokens: 2800,
         system: SYSTEM_INSTRUCTION,
         messages: [{ role: "user", content: prompt }],
       }),
