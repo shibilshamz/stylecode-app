@@ -17,17 +17,17 @@ const SKIN_TONES = [
 ];
 
 const BODY_SHAPES = [
-  { id: "Slim",      label: "Slim",      desc: "Lean frame, narrow shoulders & hips" },
-  { id: "Athletic",  label: "Athletic",  desc: "Broad shoulders, V-taper to waist" },
-  { id: "Rectangle", label: "Rectangle", desc: "Even width from shoulder to hip" },
-  { id: "Oval",      label: "Oval",      desc: "Fuller midsection, rounder belly" },
-  { id: "Broad Top", label: "Broad Top", desc: "Wide shoulders & chest, narrower hip" },
+  { id: "Slim",      label: "Slim",      emoji: "🏃", desc: "Lean frame, narrow shoulders & hips, little muscle definition. Think: runner's build" },
+  { id: "Athletic",  label: "Athletic",  emoji: "💪", desc: "Broad shoulders, defined chest, tapered waist. Think: V-shape" },
+  { id: "Rectangle", label: "Rectangle", emoji: "📏", desc: "Shoulders, waist and hips roughly same width. Think: straight up-down" },
+  { id: "Oval",      label: "Oval",      emoji: "🥚", desc: "Broader midsection, fuller waist, narrower shoulders. Think: rounded centre" },
+  { id: "Broad Top", label: "Broad Top", emoji: "🔺", desc: "Wide shoulders, chest-heavy, narrower hips. Think: top-heavy" },
 ];
 
 const HEIGHTS = [
-  { id: "Under 5'6\"",  label: "Under 5'6\"",    sub: "Petite frame" },
-  { id: "5'6\"–5'10\"", label: "5'6\" – 5'10\"", sub: "Average height" },
-  { id: "Above 5'10\"", label: "Above 5'10\"",   sub: "Tall frame" },
+  { id: "Under 5'6\"",  label: "Under 5'6\"",    cm: "Under 168 cm" },
+  { id: "5'6\"–5'10\"", label: "5'6\" – 5'10\"", cm: "168 – 178 cm"  },
+  { id: "Above 5'10\"", label: "Above 5'10\"",   cm: "Above 178 cm" },
 ];
 
 const OCCASIONS = [
@@ -74,70 +74,6 @@ interface MatchResult {
   avoid: MatchAvoid[];
 }
 
-// ─── SVG Silhouettes ─────────────────────────────────────────────────────────
-
-function SlimSilhouette() {
-  return (
-    <svg viewBox="0 0 50 92" fill="currentColor" aria-hidden="true">
-      <ellipse cx="25" cy="8" rx="6" ry="7" />
-      <rect x="22" y="14" width="6" height="5" />
-      <polygon points="17,19 33,19 30,46 20,46" />
-      <polygon points="20,46 30,46 28,88 22,88" />
-    </svg>
-  );
-}
-
-function AthleticSilhouette() {
-  return (
-    <svg viewBox="0 0 50 92" fill="currentColor" aria-hidden="true">
-      <ellipse cx="25" cy="8" rx="6" ry="7" />
-      <rect x="22" y="14" width="6" height="5" />
-      <polygon points="6,19 44,19 31,46 19,46" />
-      <polygon points="19,46 31,46 29,88 21,88" />
-    </svg>
-  );
-}
-
-function RectangleSilhouette() {
-  return (
-    <svg viewBox="0 0 50 92" fill="currentColor" aria-hidden="true">
-      <ellipse cx="25" cy="8" rx="6" ry="7" />
-      <rect x="22" y="14" width="6" height="5" />
-      <polygon points="15,19 35,19 35,46 15,46" />
-      <polygon points="15,46 35,46 35,88 15,88" />
-    </svg>
-  );
-}
-
-function OvalSilhouette() {
-  return (
-    <svg viewBox="0 0 50 92" fill="currentColor" aria-hidden="true">
-      <ellipse cx="25" cy="8" rx="6" ry="7" />
-      <rect x="22" y="14" width="6" height="5" />
-      <polygon points="17,19 33,19 40,46 10,46" />
-      <polygon points="13,46 37,46 32,88 18,88" />
-    </svg>
-  );
-}
-
-function BroadTopSilhouette() {
-  return (
-    <svg viewBox="0 0 50 92" fill="currentColor" aria-hidden="true">
-      <ellipse cx="25" cy="8" rx="6" ry="7" />
-      <rect x="22" y="14" width="6" height="5" />
-      <polygon points="3,19 47,19 32,46 18,46" />
-      <polygon points="18,46 32,46 30,88 20,88" />
-    </svg>
-  );
-}
-
-const SILHOUETTE_MAP: Record<string, () => React.JSX.Element> = {
-  "Slim":      SlimSilhouette,
-  "Athletic":  AthleticSilhouette,
-  "Rectangle": RectangleSilhouette,
-  "Oval":      OvalSilhouette,
-  "Broad Top": BroadTopSilhouette,
-};
 
 // ─── Shared step header ───────────────────────────────────────────────────────
 
@@ -363,6 +299,11 @@ export default function App() {
   const [result, setResult]       = useState<StyleResult | null>(null);
   const [error, setError]         = useState("");
 
+  // Skin scan state
+  const [scanLoading, setScanLoading]     = useState(false);
+  const [detectedTone, setDetectedTone]   = useState("");
+  const [detectedLabel, setDetectedLabel] = useState("");
+
   // Match My Clothes state
   const [matchSkinTone, setMatchSkinTone]       = useState("");
   const [matchImageBase64, setMatchImageBase64] = useState("");
@@ -387,6 +328,40 @@ export default function App() {
       setError(`Error: ${msg}`);
       setScreen("step4");
     }
+  }
+
+  function handleSkinScan(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setScanLoading(true);
+    setDetectedTone("");
+    setDetectedLabel("");
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      const [header, base64] = dataUrl.split(",");
+      const mimeType = header.split(":")[1].split(";")[0];
+      try {
+        const res = await fetch(`${API_URL}/api/detect-skin-tone`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ imageBase64: base64, mimeType }),
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json() as { skinToneId: string; skinToneLabel: string; confidence: string };
+        const matched = SKIN_TONES.find(t => t.id === data.skinToneId);
+        if (matched) {
+          setSkinTone(matched.id);
+          setDetectedTone(matched.id);
+          setDetectedLabel(data.skinToneLabel);
+        }
+      } catch {
+        // fall through — user picks manually
+      } finally {
+        setScanLoading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -436,6 +411,7 @@ export default function App() {
   function goHome() {
     setSkinTone(""); setBodyShape(""); setHeight(""); setOccasion("");
     setResult(null); setError("");
+    setScanLoading(false); setDetectedTone(""); setDetectedLabel("");
     setMatchSkinTone(""); setMatchImageBase64(""); setMatchMimeType("");
     setMatchPreview(""); setMatchResult(null); setMatchError("");
     setScreen("home");
@@ -444,6 +420,7 @@ export default function App() {
   function restartProfile() {
     setSkinTone(""); setBodyShape(""); setHeight(""); setOccasion("");
     setResult(null); setError("");
+    setScanLoading(false); setDetectedTone(""); setDetectedLabel("");
     setScreen("step1");
   }
 
@@ -495,13 +472,32 @@ export default function App() {
               <button
                 key={t.id}
                 className={`skin-option ${skinTone === t.id ? "selected" : ""}`}
-                onClick={() => setSkinTone(t.id)}
+                onClick={() => { setSkinTone(t.id); setDetectedTone(""); setDetectedLabel(""); }}
               >
                 <span className="skin-swatch" style={{ background: t.hex }} />
                 <span className="skin-label">{t.label}</span>
               </button>
             ))}
           </div>
+
+          <div className="skin-scan-divider"><span>or detect automatically</span></div>
+          <div className="skin-scan-area">
+            <label className={`skin-scan-btn${scanLoading ? " skin-scan-btn--loading" : ""}`} htmlFor="skin-scan-upload">
+              {scanLoading ? "Detecting…" : "📷 Scan from photo"}
+            </label>
+            <input
+              id="skin-scan-upload"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="upload-input"
+              disabled={scanLoading}
+              onChange={handleSkinScan}
+            />
+            {detectedTone && (
+              <p className="skin-scan-result">Detected: {detectedLabel} skin tone ✓</p>
+            )}
+          </div>
+
           <div className="nav-row">
             <button className="btn-ghost" onClick={goHome}>Back</button>
             <button className="btn-primary" disabled={!skinTone} onClick={() => setScreen("step2")}>
@@ -520,20 +516,17 @@ export default function App() {
         <div className="screen">
           <StepHeader step={2} title="What is your body shape?" subtitle="Silhouette is everything. Dress with your shape, not against it." />
           <div className="shape-grid">
-            {BODY_SHAPES.map((s) => {
-              const Svg = SILHOUETTE_MAP[s.id];
-              return (
-                <button
-                  key={s.id}
-                  className={`shape-option ${bodyShape === s.id ? "selected" : ""}`}
-                  onClick={() => setBodyShape(s.id)}
-                >
-                  <div className="shape-svg"><Svg /></div>
-                  <span className="shape-label">{s.label}</span>
-                  <span className="shape-desc">{s.desc}</span>
-                </button>
-              );
-            })}
+            {BODY_SHAPES.map((s) => (
+              <button
+                key={s.id}
+                className={`shape-option ${bodyShape === s.id ? "selected" : ""}`}
+                onClick={() => setBodyShape(s.id)}
+              >
+                <span className="shape-emoji">{s.emoji}</span>
+                <span className="shape-label">{s.label}</span>
+                <span className="shape-desc">{s.desc}</span>
+              </button>
+            ))}
           </div>
           <div className="nav-row">
             <button className="btn-ghost" onClick={() => setScreen("step1")}>Back</button>
@@ -560,7 +553,7 @@ export default function App() {
                 onClick={() => setHeight(h.id)}
               >
                 <span className="height-label">{h.label}</span>
-                <span className="height-sub">{h.sub}</span>
+                <span className="height-cm">{h.cm}</span>
               </button>
             ))}
           </div>

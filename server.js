@@ -351,5 +351,56 @@ Return ONLY a single valid JSON object — no markdown, no explanation — with 
   }
 });
 
+// ─── POST /api/detect-skin-tone ──────────────────────────────────────────────
+
+app.post("/api/detect-skin-tone", async (req, res) => {
+  const { imageBase64, mimeType } = req.body ?? {};
+  if (!imageBase64 || !mimeType) {
+    return res.status(400).json({ error: "Missing imageBase64 or mimeType" });
+  }
+
+  const systemPrompt = `You are a skin tone analyser. Look at the person's skin in this image (face or wrist area). Classify their skin tone into exactly one of these categories: Fair, Light Wheat, Wheat, Dusky, Deep Brown, Very Deep. Return ONLY valid JSON with no markdown: { "skinToneId": "...", "skinToneLabel": "...", "confidence": "high" | "medium" | "low" }. The skinToneId and skinToneLabel must exactly match one of these pairs: Fair/Fair, Light Wheat/Light Wheat, Wheat/Wheat, Dusky/Dusky, Deep Brown/Deep Brown, Very Deep/Very Deep.`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": API_KEY,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 100,
+        system: systemPrompt,
+        messages: [{
+          role: "user",
+          content: [
+            { type: "image", source: { type: "base64", media_type: mimeType, data: imageBase64 } },
+            { type: "text", text: "Analyse the skin tone in this image and return the JSON classification." },
+          ],
+        }],
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      return res.status(502).json({ error: `Anthropic error ${response.status}: ${errText}` });
+    }
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text?.trim() ?? "";
+    const clean = raw.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/\s*```$/, "").trim();
+
+    let parsed;
+    try { parsed = JSON.parse(clean); }
+    catch { return res.status(502).json({ error: "Invalid JSON from Claude" }); }
+
+    return res.json(parsed);
+  } catch (err) {
+    return res.status(500).json({ error: String(err) });
+  }
+});
+
 const PORT = 3001;
 app.listen(PORT, () => console.log(`StyleCode proxy running on http://localhost:${PORT}`));

@@ -213,16 +213,10 @@
   background: #FEF9F3;
 }
 
-.shape-svg {
-  width: 44px;
-  height: 76px;
-  color: #BDB3A4;
-  transition: color 0.18s;
-}
-
-.shape-option.selected .shape-svg,
-.shape-option:hover .shape-svg {
-  color: #C4783A;
+.shape-emoji {
+  font-size: 32px;
+  line-height: 1;
+  margin-bottom: 2px;
 }
 
 .shape-label {
@@ -276,10 +270,10 @@
   color: #1A1612;
 }
 
-.height-sub {
-  font-size: 12px;
+.height-cm {
+  font-size: 11px;
   color: #9A8F80;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 }
 
 /* ── Occasion grid ────────────────────────────────────────────────────────── */
@@ -1003,6 +997,68 @@
   justify-content: space-between;
 }
 
+/* ── Skin scan ────────────────────────────────────────────────────────────── */
+
+.skin-scan-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #9A8F80;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+
+.skin-scan-divider::before,
+.skin-scan-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E2DAC8;
+}
+
+.skin-scan-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.skin-scan-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: 1.5px dashed #C4783A;
+  border-radius: 6px;
+  background: transparent;
+  color: #C4783A;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.skin-scan-btn:hover {
+  background: #FEF9F3;
+}
+
+.skin-scan-btn--loading {
+  opacity: 0.6;
+  cursor: default;
+  border-style: solid;
+}
+
+.skin-scan-result {
+  font-size: 13px;
+  color: #5A7A4A;
+  font-weight: 500;
+  background: #F0F6EC;
+  border: 1px solid #C4DDB4;
+  border-radius: 4px;
+  padding: 8px 14px;
+}
+
 /* ── Responsive (mobile: 375–480px) ──────────────────────────────────────── */
 
 @media (max-width: 480px) {
@@ -1024,8 +1080,11 @@
   /* Skin tone — 2 columns */
   .skin-grid { grid-template-columns: repeat(2, 1fr); }
 
-  /* Body shape — 3 columns */
-  .shape-grid { grid-template-columns: repeat(3, 1fr); }
+  /* Body shape — 2 columns */
+  .shape-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Skin scan — full width button */
+  .skin-scan-btn { width: 100%; justify-content: center; }
 
   /* Occasion — 2 columns */
   .occasion-grid { grid-template-columns: repeat(2, 1fr); }
