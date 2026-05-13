@@ -17,11 +17,11 @@ const SKIN_TONES = [
 ];
 
 const BODY_SHAPES = [
-  { id: "Slim",      label: "Slim",      emoji: "🏃", desc: "Lean frame, narrow shoulders & hips, little muscle definition. Think: runner's build" },
-  { id: "Athletic",  label: "Athletic",  emoji: "💪", desc: "Broad shoulders, defined chest, tapered waist. Think: V-shape" },
-  { id: "Rectangle", label: "Rectangle", emoji: "📏", desc: "Shoulders, waist and hips roughly same width. Think: straight up-down" },
-  { id: "Oval",      label: "Oval",      emoji: "🥚", desc: "Broader midsection, fuller waist, narrower shoulders. Think: rounded centre" },
-  { id: "Broad Top", label: "Broad Top", emoji: "🔺", desc: "Wide shoulders, chest-heavy, narrower hips. Think: top-heavy" },
+  { id: "Slim",      label: "Slim",      sW: 18, wW: 16, hW: 17, desc: "Lean frame, narrow shoulders & hips, little muscle definition. Think: runner's build" },
+  { id: "Athletic",  label: "Athletic",  sW: 26, wW: 17, hW: 19, desc: "Broad shoulders, defined chest, tapered waist. Think: V-shape" },
+  { id: "Rectangle", label: "Rectangle", sW: 22, wW: 21, hW: 22, desc: "Shoulders, waist and hips roughly same width. Think: straight up-down" },
+  { id: "Oval",      label: "Oval",      sW: 20, wW: 26, hW: 23, desc: "Broader midsection, fuller waist, narrower shoulders. Think: rounded centre" },
+  { id: "Broad Top", label: "Broad Top", sW: 28, wW: 19, hW: 18, desc: "Wide shoulders, chest-heavy, narrower hips. Think: top-heavy" },
 ];
 
 const HEIGHTS = [
@@ -74,6 +74,34 @@ interface MatchResult {
   avoid: MatchAvoid[];
 }
 
+
+// ─── Torso silhouette SVG ─────────────────────────────────────────────────────
+
+function TorsoSVG({ sW, wW, hW, selected }: { sW: number; wW: number; hW: number; selected: boolean }) {
+  const cx = 30, sY = 6, waistY = 44, hipY = 76, cp = 14;
+  const d = [
+    `M${cx - sW} ${sY} L${cx + sW} ${sY}`,
+    `C${cx + sW} ${sY + cp} ${cx + wW} ${waistY - cp} ${cx + wW} ${waistY}`,
+    `C${cx + wW} ${waistY + cp} ${cx + hW} ${hipY - cp} ${cx + hW} ${hipY}`,
+    `L${cx - hW} ${hipY}`,
+    `C${cx - hW} ${hipY - cp} ${cx - wW} ${waistY + cp} ${cx - wW} ${waistY}`,
+    `C${cx - wW} ${waistY - cp} ${cx - sW} ${sY + cp} ${cx - sW} ${sY} Z`,
+  ].join(" ");
+
+  return (
+    <svg viewBox="0 0 60 84" width="60" height="84" aria-hidden="true">
+      <path
+        d={d}
+        fill={selected ? "var(--warm)" : "var(--ink)"}
+        fillOpacity={selected ? 0.15 : 0.06}
+        stroke={selected ? "var(--warm)" : "var(--ink)"}
+        strokeOpacity={selected ? 1 : 0.4}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 // ─── Shared step header ───────────────────────────────────────────────────────
 
@@ -522,7 +550,7 @@ export default function App() {
                 className={`shape-option ${bodyShape === s.id ? "selected" : ""}`}
                 onClick={() => setBodyShape(s.id)}
               >
-                <span className="shape-emoji">{s.emoji}</span>
+                <TorsoSVG sW={s.sW} wW={s.wW} hW={s.hW} selected={bodyShape === s.id} />
                 <span className="shape-label">{s.label}</span>
                 <span className="shape-desc">{s.desc}</span>
               </button>

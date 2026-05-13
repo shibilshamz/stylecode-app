@@ -1,3 +1,10 @@
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+
+:root {
+  --ink:  #1A1612;
+  --warm: #C4783A;
+}
+
 /* ── Layout ───────────────────────────────────────────────────────────────── */
 
 .app {
@@ -213,10 +220,8 @@
   background: #FEF9F3;
 }
 
-.shape-emoji {
-  font-size: 32px;
-  line-height: 1;
-  margin-bottom: 2px;
+.shape-option svg {
+  display: block;
 }
 
 .shape-label {
