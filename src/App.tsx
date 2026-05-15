@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getStyleAdvice } from "./geminiAdvisor";
 import type { StyleResult, StyleProfile } from "./geminiAdvisor";
 import "./App.css";
@@ -172,62 +172,28 @@ function OutfitFigure({ colors }: { colors: { hex: string }[] }) {
   );
 }
 
-function buildPexelsQuery(occasion: string, firstColour: string): string {
-  const occasionMap: Record<string, string> = {
-    office:  "formal",
-    casual:  "casual streetwear",
-    date:    "evening smart",
-    wedding: "ethnic traditional",
-    gym:     "activewear",
-    beach:   "summer resort",
+function buildShopUrl(colourName: string, occasion: string): string {
+  const itemMap: Record<string, string> = {
+    casual:  "shirt",
+    office:  "dress+shirt",
+    date:    "shirt",
+    wedding: "kurta",
+    gym:     "t-shirt",
+    beach:   "shirt",
   };
   const key = occasion.toLowerCase().replace(/[^a-z\s]/g, "").trim().split(/\s+/)[0];
-  const keyword = occasionMap[key] ?? key;
-  return `men ${keyword} ${firstColour} outfit`.trim();
+  const item = itemMap[key] ?? "shirt";
+  const name = colourName.toLowerCase().replace(/\s+/g, "+");
+  return `https://www.noon.com/uae-en/search/?q=men+${name}+${item}`;
 }
 
 function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
-  const [photoUrl, setPhotoUrl]           = useState<string | null>(null);
-  const [photographer, setPhotographer]   = useState("");
-  const [imgError, setImgError]           = useState(false);
-
-  useEffect(() => {
-    const query = buildPexelsQuery(outfit.occasion, outfit.colors[0]?.name ?? "");
-    fetch(`${API_URL}/api/pexels-photo`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query }),
-    })
-      .then(r => r.json() as Promise<{ photoUrl: string | null; photographer?: string }>)
-      .then(data => {
-        if (data.photoUrl) {
-          setPhotoUrl(data.photoUrl);
-          setPhotographer(data.photographer ?? "");
-        }
-      })
-      .catch(() => {});
-  }, [outfit.name, outfit.occasion]);
-
-  const showPhoto = photoUrl !== null && !imgError;
-
   return (
     <div className="outfit-card">
-      <div className={`outfit-figure-area${showPhoto ? " outfit-figure-area--photo" : ""}`}>
-        {showPhoto ? (
-          <>
-            <img
-              src={photoUrl}
-              alt={outfit.name}
-              className="outfit-photo"
-              onError={() => setImgError(true)}
-            />
-            {photographer && (
-              <span className="photo-credit">Photo: {photographer} / Pexels</span>
-            )}
-          </>
-        ) : (
-          <OutfitFigure colors={outfit.colors} />
-        )}
+      <div className="outfit-color-bar">
+        {outfit.colors.map((c) => (
+          <div key={c.hex} className="outfit-color-bar-section" style={{ background: c.hex }} />
+        ))}
       </div>
       <div className="outfit-body">
         <div className="outfit-top">
@@ -235,9 +201,17 @@ function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
           <span className="outfit-badge">{outfit.occasion}</span>
         </div>
         <p className="outfit-why">{outfit.why}</p>
-        <div className="outfit-color-chips">
-          {outfit.colors.map((c, i) => (
-            <div key={i} className="outfit-color-chip" style={{ background: c.hex }} title={c.name} />
+        <div className="outfit-shop-row">
+          {outfit.colors.map((c) => (
+            <a
+              key={c.hex}
+              href={buildShopUrl(c.name, outfit.occasion)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shop-btn"
+            >
+              🛍 {c.name}
+            </a>
           ))}
         </div>
       </div>
@@ -248,51 +222,12 @@ function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
 // ─── Match My Clothes result components ───────────────────────────────────────
 
 function MatchOutfitCard({ outfit }: { outfit: MatchOutfit }) {
-  const [photoUrl, setPhotoUrl]         = useState<string | null>(null);
-  const [photographer, setPhotographer] = useState("");
-  const [imgError, setImgError]         = useState(false);
-
-  useEffect(() => {
-    const query = buildPexelsQuery(outfit.occasion, "");
-    fetch(`${API_URL}/api/pexels-photo`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query }),
-    })
-      .then(r => r.json() as Promise<{ photoUrl: string | null; photographer?: string }>)
-      .then(data => {
-        if (data.photoUrl) {
-          setPhotoUrl(data.photoUrl);
-          setPhotographer(data.photographer ?? "");
-        }
-      })
-      .catch(() => {});
-  }, [outfit.name, outfit.occasion]);
-
-  const showPhoto = photoUrl !== null && !imgError;
-
   return (
     <div className="outfit-card">
-      <div className={`outfit-figure-area${showPhoto ? " outfit-figure-area--photo" : ""}`}>
-        {showPhoto ? (
-          <>
-            <img
-              src={photoUrl}
-              alt={outfit.name}
-              className="outfit-photo"
-              onError={() => setImgError(true)}
-            />
-            {photographer && (
-              <span className="photo-credit">Photo: {photographer} / Pexels</span>
-            )}
-          </>
-        ) : (
-          <div className="match-outfit-colors">
-            {outfit.colours.map((c, i) => (
-              <div key={i} className="match-outfit-color-block" style={{ background: c, flex: i === 0 ? 2 : 1 }} />
-            ))}
-          </div>
-        )}
+      <div className="outfit-color-bar">
+        {outfit.colours.map((c, i) => (
+          <div key={i} className="outfit-color-bar-section" style={{ background: c, flex: i === 0 ? 2 : 1 }} />
+        ))}
       </div>
       <div className="outfit-body">
         <div className="outfit-top">
@@ -300,11 +235,6 @@ function MatchOutfitCard({ outfit }: { outfit: MatchOutfit }) {
           <span className="outfit-badge">{outfit.occasion}</span>
         </div>
         <p className="outfit-why">{outfit.why}</p>
-        <div className="outfit-color-chips">
-          {outfit.colours.map((c, i) => (
-            <div key={i} className="outfit-color-chip" style={{ background: c }} />
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -839,6 +769,14 @@ export default function App() {
                   <span className="match-swatch-pantone">{m.pantone}</span>
                   <span className="match-swatch-realworld">"{m.realWorldRef}"</span>
                   <p className="match-swatch-reason">{m.reason}</p>
+                  <a
+                    href={buildShopUrl(m.name, "casual")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shop-btn"
+                  >
+                    🛍 {m.name}
+                  </a>
                 </div>
               ))}
             </div>
