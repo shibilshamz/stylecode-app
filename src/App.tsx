@@ -143,34 +143,6 @@ function Palette({ swatches }: { swatches: { name: string; hex: string; pantone:
   );
 }
 
-function OutfitFigure({ colors }: { colors: { hex: string }[] }) {
-  const shirt    = colors[0]?.hex ?? "#BDB3A4";
-  const trousers = colors[1]?.hex ?? "#8A7E72";
-  const jacket   = colors[2]?.hex;
-
-  return (
-    <svg viewBox="0 0 80 132" className="outfit-figure" aria-hidden="true">
-      {/* shadow */}
-      <ellipse cx="40" cy="128" rx="15" ry="3" fill="rgba(0,0,0,0.07)" />
-      {/* trousers — two legs with a small gap */}
-      <polygon points="24,73 39,73 37,125 22,125" fill={trousers} />
-      <polygon points="41,73 56,73 58,125 43,125" fill={trousers} />
-      {/* shirt */}
-      <polygon points="18,28 62,28 56,73 24,73" fill={shirt} />
-      {/* jacket panels (optional) */}
-      {jacket && (
-        <>
-          <polygon points="18,28 40,28 35,47 27,73 24,73" fill={jacket} />
-          <polygon points="40,28 62,28 56,73 53,73 45,47" fill={jacket} />
-        </>
-      )}
-      {/* neck */}
-      <rect x="36" y="21" width="8" height="9" fill="#C8936A" />
-      {/* head */}
-      <ellipse cx="40" cy="12" rx="10" ry="11" fill="#C8936A" />
-    </svg>
-  );
-}
 
 function buildShopUrl(colourName: string, occasion: string): string {
   const itemMap: Record<string, string> = {
