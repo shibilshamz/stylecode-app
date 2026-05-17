@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getStyleAdvice } from "./geminiAdvisor";
 import type { StyleResult, StyleProfile } from "./geminiAdvisor";
 import "./App.css";
@@ -241,6 +241,10 @@ export default function App() {
   const [matchPreview, setMatchPreview]         = useState("");
   const [matchResult, setMatchResult]           = useState<MatchResult | null>(null);
   const [matchError, setMatchError]             = useState("");
+
+  useEffect(() => {
+    fetch("https://stylecode-app.onrender.com/health").catch(() => {});
+  }, []);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
