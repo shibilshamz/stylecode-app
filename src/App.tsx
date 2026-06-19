@@ -161,7 +161,7 @@ function buildShopUrl(colourName: string, occasion: string, platform: "namshi" |
     return `https://en-ae.namshi.com/men-clothing/?q=${name}+${item}`;
   }
   if (platform === "amazon") {
-    return `https://www.amazon.ae/s?k=men+${name}+${item}&rh=n%3A11557240031`;
+    return `https://www.amazon.ae/s?k=men+${name}+${item}&rh=n%3A11557240031&tag=stylecode06-21`;
   }
   return `https://www.noon.com/uae-en/search/?q=men+${name}+${item}`;
 }
@@ -227,7 +227,7 @@ function ShopPalette({
           activePlatform === "namshi"
             ? "https://en-ae.namshi.com/men-clothing/"
             : activePlatform === "amazon"
-            ? "https://www.amazon.ae/s?rh=n%3A11557240031"
+            ? "https://www.amazon.ae/s?rh=n%3A11557240031&tag=stylecode06-21"
             : "https://www.noon.com/uae-en/men-fashion/"
         }
         target="_blank"
