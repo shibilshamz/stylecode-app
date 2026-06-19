@@ -144,10 +144,10 @@ function Palette({ swatches }: { swatches: { name: string; hex: string; pantone:
 }
 
 
-function buildShopUrl(colourName: string, occasion: string, platform: "namshi" | "noon" = "namshi"): string {
+function buildShopUrl(colourName: string, occasion: string, platform: "namshi" | "amazon" | "noon" = "namshi"): string {
   const itemMap: Record<string, string> = {
     casual:  "shirt",
-    office:  "dress+shirt",
+    office:  "dress shirt",
     date:    "shirt",
     wedding: "kurta",
     gym:     "t-shirt",
@@ -156,16 +156,21 @@ function buildShopUrl(colourName: string, occasion: string, platform: "namshi" |
   const key = occasion.toLowerCase().replace(/[^a-z\s]/g, "").trim().split(/\s+/)[0];
   const item = itemMap[key] ?? "shirt";
   const name = colourName.toLowerCase().replace(/\s+/g, "+");
+
   if (platform === "namshi") {
     return `https://en-ae.namshi.com/men-clothing/?q=${name}+${item}`;
+  }
+  if (platform === "amazon") {
+    return `https://www.amazon.ae/s?k=men+${name}+${item}&rh=n%3A11557240031`;
   }
   return `https://www.noon.com/uae-en/search/?q=men+${name}+${item}`;
 }
 
 // ─── Shop Your Palette section ────────────────────────────────────────────────
 const SHOP_PLATFORMS = [
-  { id: "namshi", label: "Namshi", badge: "Up to 10% off", note: "700+ brands · UAE" },
-  { id: "noon",   label: "Noon",   badge: "Fast delivery",  note: "2M+ products · UAE" },
+  { id: "namshi", label: "Namshi", note: "700+ brands · UAE" },
+  { id: "amazon", label: "Amazon", note: "Fast delivery · UAE" },
+  { id: "noon",   label: "Noon",   note: "2M+ products · UAE" },
 ] as const;
 
 function ShopPalette({
@@ -175,7 +180,7 @@ function ShopPalette({
   swatches: { name: string; hex: string }[];
   occasion: string;
 }) {
-  const [activePlatform, setActivePlatform] = useState<"namshi" | "noon">("namshi");
+  const [activePlatform, setActivePlatform] = useState<"namshi" | "amazon" | "noon">("namshi");
   const featured = swatches.slice(0, 4);
   return (
     <section className="shop-palette-section">
@@ -221,13 +226,20 @@ function ShopPalette({
         href={
           activePlatform === "namshi"
             ? "https://en-ae.namshi.com/men-clothing/"
+            : activePlatform === "amazon"
+            ? "https://www.amazon.ae/s?rh=n%3A11557240031"
             : "https://www.noon.com/uae-en/men-fashion/"
         }
         target="_blank"
         rel="noopener noreferrer"
         className="shop-browse-all"
       >
-        Browse all men's fashion on {activePlatform === "namshi" ? "Namshi" : "Noon"} →
+        Browse all men's fashion on{" "}
+        {activePlatform === "namshi"
+          ? "Namshi"
+          : activePlatform === "amazon"
+          ? "Amazon UAE"
+          : "Noon"}{" "}→
       </a>
     </section>
   );
