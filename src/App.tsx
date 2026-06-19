@@ -228,7 +228,7 @@ function ShopPalette({
             ? "https://en-ae.namshi.com/men-clothing/"
             : activePlatform === "amazon"
             ? "https://www.amazon.ae/s?rh=n%3A11557240031&tag=stylecode06-21"
-            : "https://www.noon.com/uae-en/men-fashion/"
+            : "https://s.noon.com/_VN9eZMNlP8"
         }
         target="_blank"
         rel="noopener noreferrer"
