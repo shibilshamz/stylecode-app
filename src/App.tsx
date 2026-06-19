@@ -144,7 +144,7 @@ function Palette({ swatches }: { swatches: { name: string; hex: string; pantone:
 }
 
 
-function buildShopUrl(colourName: string, occasion: string): string {
+function buildShopUrl(colourName: string, occasion: string, platform: "namshi" | "noon" = "namshi"): string {
   const itemMap: Record<string, string> = {
     casual:  "shirt",
     office:  "dress+shirt",
@@ -156,7 +156,81 @@ function buildShopUrl(colourName: string, occasion: string): string {
   const key = occasion.toLowerCase().replace(/[^a-z\s]/g, "").trim().split(/\s+/)[0];
   const item = itemMap[key] ?? "shirt";
   const name = colourName.toLowerCase().replace(/\s+/g, "+");
+  if (platform === "namshi") {
+    return `https://en-ae.namshi.com/men-clothing/?q=${name}+${item}`;
+  }
   return `https://www.noon.com/uae-en/search/?q=men+${name}+${item}`;
+}
+
+// ─── Shop Your Palette section ────────────────────────────────────────────────
+const SHOP_PLATFORMS = [
+  { id: "namshi", label: "Namshi", badge: "Up to 10% off", note: "700+ brands · UAE" },
+  { id: "noon",   label: "Noon",   badge: "Fast delivery",  note: "2M+ products · UAE" },
+] as const;
+
+function ShopPalette({
+  swatches,
+  occasion,
+}: {
+  swatches: { name: string; hex: string }[];
+  occasion: string;
+}) {
+  const [activePlatform, setActivePlatform] = useState<"namshi" | "noon">("namshi");
+  const featured = swatches.slice(0, 4);
+  return (
+    <section className="shop-palette-section">
+      <div className="shop-palette-header">
+        <h3 className="section-label">Shop Your Palette</h3>
+        <p className="shop-palette-sub">
+          Every colour below is matched to your profile. Tap to find it now.
+        </p>
+      </div>
+      {/* Platform toggle */}
+      <div className="shop-platform-toggle">
+        {SHOP_PLATFORMS.map((p) => (
+          <button
+            key={p.id}
+            className={`shop-platform-btn ${activePlatform === p.id ? "active" : ""}`}
+            onClick={() => setActivePlatform(p.id)}
+          >
+            <span className="shop-platform-name">{p.label}</span>
+            <span className="shop-platform-note">{p.note}</span>
+          </button>
+        ))}
+      </div>
+      {/* Colour shopping cards */}
+      <div className="shop-colour-grid">
+        {featured.map((s) => (
+          <a
+            key={s.hex}
+            href={buildShopUrl(s.name, occasion, activePlatform)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shop-colour-card"
+          >
+            <div className="shop-colour-swatch" style={{ background: s.hex }} />
+            <div className="shop-colour-info">
+              <span className="shop-colour-name">{s.name}</span>
+              <span className="shop-colour-cta">Find {s.name} pieces →</span>
+            </div>
+          </a>
+        ))}
+      </div>
+      {/* Browse all CTA */}
+      <a
+        href={
+          activePlatform === "namshi"
+            ? "https://en-ae.namshi.com/men-clothing/"
+            : "https://www.noon.com/uae-en/men-fashion/"
+        }
+        target="_blank"
+        rel="noopener noreferrer"
+        className="shop-browse-all"
+      >
+        Browse all men's fashion on {activePlatform === "namshi" ? "Namshi" : "Noon"} →
+      </a>
+    </section>
+  );
 }
 
 function OutfitCard({ outfit }: { outfit: StyleResult["outfits"][0] }) {
@@ -575,6 +649,8 @@ export default function App() {
             <h3 className="section-label">Your Colour Palette</h3>
             <Palette swatches={result.palette} />
           </section>
+
+          <ShopPalette swatches={result.palette} occasion={occasion} />
 
           <section className="result-section">
             <h3 className="section-label">Curated Outfits</h3>
